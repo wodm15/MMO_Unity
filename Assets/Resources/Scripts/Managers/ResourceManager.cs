@@ -12,9 +12,10 @@ public class ResourceManager
     public GameObject Instantiate(string path, Transform parent = null)
     {
         GameObject prefab = Load<GameObject>($"Prefabs/{path}");
-        if(prefab == null)
+        if (prefab == null)
         {
-            Debug.Log("Failed to load prefab : {path}");
+            Debug.Log($"Failed to load prefab : {path}");
+            return null;
         }
 
         return Object.Instantiate(prefab, parent);
@@ -22,7 +23,8 @@ public class ResourceManager
 
     public void Destroy(GameObject go)
     {
-        if (go == null) return;
+        if (go == null)
+            return;
 
         Object.Destroy(go);
     }
