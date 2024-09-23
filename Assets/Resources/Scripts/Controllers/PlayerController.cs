@@ -17,8 +17,10 @@ public class PlayerController : MonoBehaviour
 		// Managers.Input.KeyAction += OnKeyboard;
 		Managers.Input.MouseAction -= OnMouseClicked;
 		Managers.Input.MouseAction += OnMouseClicked;
+
+		Managers.Resource.Instantiate("UI/UI_Button");
 	}
-	float wait_run_ratio = 0;
+
 
 	public enum PlayerState
 	{
@@ -49,17 +51,22 @@ public class PlayerController : MonoBehaviour
 		}
 
 		//애니메이션 처리
-		wait_run_ratio = Mathf.Lerp(wait_run_ratio , 1 ,10.0f * Time.deltaTime);
 		Animator anim = GetComponent<Animator>();
-		anim.SetFloat("wait_run_ratio", wait_run_ratio);
+		anim.SetFloat("speed" , _speed);
+		// anim.SetFloat("wait_run_ratio", wait_run_ratio);
 	}
+
+	// void OnRunEvent(int a)
+	// {
+	// 	Debug.Log($"뚜벅 뚜벅 {a}");
+	// }
 
 	void UpdateIdle()
     {
 		//애니메이션
-		wait_run_ratio = Mathf.Lerp(wait_run_ratio , 0 ,10.0f * Time.deltaTime);
 		Animator anim = GetComponent<Animator>();
-		anim.SetFloat("wait_run_ratio", wait_run_ratio);
+		anim.SetFloat("speed" , 0);
+		// anim.SetFloat("wait_run_ratio", wait_run_ratio);
 
     }
     void Update()
