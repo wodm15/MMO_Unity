@@ -5,26 +5,21 @@ using UnityEngine.AI;
 
 public class PlayerController : BaseController
 {
-	
 	int _mask = (1 << (int)Define.Layer.Ground) | (1 << (int)Define.Layer.Monster);
 
-
 	PlayerStat _stat;
-
 	bool _stopSkill = false;
 
 	public override void Init()
     {
-
+		WorldObjectType = Define.WorldObject.Player;
 		_stat = gameObject.GetComponent<PlayerStat>();
-
 		Managers.Input.MouseAction -= OnMouseEvent;
-		Managers.Input.MouseAction += OnMouseEvent;	
+		Managers.Input.MouseAction += OnMouseEvent;
 
-		if(gameObject.GetComponentInChildren<UI_HPBar>() == null)
-		Managers.UI.MakeWorldSpaceUI<UI_HPBar>(transform);
+		if (gameObject.GetComponentInChildren<UI_HPBar>() == null)
+			Managers.UI.MakeWorldSpaceUI<UI_HPBar>(transform);
 	}
-
 
 	protected override void UpdateMoving()
 	{
@@ -42,16 +37,14 @@ public class PlayerController : BaseController
 
 		// 이동
 		Vector3 dir = _destPos - transform.position;
+		dir.y = 0;
+
 		if (dir.magnitude < 0.1f)
 		{
 			State = Define.State.Idle;
 		}
 		else
 		{
-			NavMeshAgent nma = gameObject.GetOrAddComponent<NavMeshAgent>();
-			float moveDist = Mathf.Clamp(_stat.MoveSpeed * Time.deltaTime, 0, dir.magnitude);
-			nma.Move(dir.normalized * moveDist);
-
 			Debug.DrawRay(transform.position + Vector3.up * 0.5f, dir.normalized, Color.green);
 			if (Physics.Raycast(transform.position + Vector3.up * 0.5f, dir, 1.0f, LayerMask.GetMask("Block")))
 			{
@@ -60,6 +53,8 @@ public class PlayerController : BaseController
 				return;
 			}
 
+			float moveDist = Mathf.Clamp(_stat.MoveSpeed * Time.deltaTime, 0, dir.magnitude);
+			transform.position += dir.normalized * moveDist;
 			transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
 		}
 	}
@@ -76,17 +71,12 @@ public class PlayerController : BaseController
 
 	void OnHitEvent()
 	{
-		Debug.Log("OnHitEvent");
-		if(_lockTarget != null)
+		if (_lockTarget != null)
 		{
-			Stat TargetStat = _lockTarget.GetComponent<Stat>();
-			PlayerStat myStat = gameObject.GetComponent<PlayerStat>();
-			int damage = Mathf.Max(0, myStat.Attack - TargetStat.Defense);
-			Debug.Log(damage + " damage");
-			TargetStat.Hp -= damage;
+			Stat targetStat = _lockTarget.GetComponent<Stat>();
+			targetStat.OnAttacked(_stat);
 		}
 
-		// TODO
 		if (_stopSkill)
 		{
 			State = Define.State.Idle;
@@ -96,8 +86,6 @@ public class PlayerController : BaseController
 			State = Define.State.Skill;
 		}
 	}
-
-
 
 	void OnMouseEvent(Define.MouseEvent evt)
 	{

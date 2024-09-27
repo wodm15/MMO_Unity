@@ -1,22 +1,20 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class BaseController : MonoBehaviour
 {
-
-    [SerializeField]
+	[SerializeField]
 	protected Vector3 _destPos;
 
 	[SerializeField]
 	protected Define.State _state = Define.State.Idle;
-	[SerializeField]	
+
+	[SerializeField]
 	protected GameObject _lockTarget;
 
-    private void Start()
-    {
-        Init();
-    }
+	public Define.WorldObject WorldObjectType { get; protected set; } = Define.WorldObject.Unknown;
+
 	public virtual Define.State State
 	{
 		get { return _state; }
@@ -42,8 +40,13 @@ public abstract class BaseController : MonoBehaviour
 		}
 	}
 
-    void Update()
-    {
+	private void Start()
+	{
+		Init();
+	}
+
+	void Update()
+	{
 		switch (State)
 		{
 			case Define.State.Die:
@@ -61,9 +64,10 @@ public abstract class BaseController : MonoBehaviour
 		}
 	}
 
-    public abstract void Init();
-    protected virtual void UpdateDie() {}
-    protected virtual void UpdateMoving() {}
-    protected virtual void UpdateIdle() {}
-    protected virtual void UpdateSkill() {}
+	public abstract void Init();
+
+	protected virtual void UpdateDie() { }
+	protected virtual void UpdateMoving() { }
+	protected virtual void UpdateIdle() { }
+	protected virtual void UpdateSkill() { }
 }
